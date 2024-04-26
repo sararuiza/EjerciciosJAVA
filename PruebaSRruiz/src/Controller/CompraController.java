@@ -1,14 +1,13 @@
 package Controller;
 
-import Entity.Cliente;
 import Entity.Compra;
 
+import Entity.Producto;
 import Model.CompraModel;
 import Model.ClienteModel;
 import Model.ProductoModel;
 
 import javax.swing.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class CompraController {
@@ -75,18 +74,31 @@ public class CompraController {
 
 
         Compra objCompra= new Compra();
+
         String fecha_compra = JOptionPane.showInputDialog(null,"Ingrese la fecha de compra YYYY-MM-DD:  ");
         int cantidad =Integer.parseInt(JOptionPane.showInputDialog(null,"Ingrese la cantidad: "));
         int id_cliente = Integer.parseInt(JOptionPane.showInputDialog(null, objClienteController.getAll(objClienteModel.findAll()),"Ingrese id_cliente: "));
         int id_producto = Integer.parseInt(JOptionPane.showInputDialog(null, objProductoController.getAll(objProductoModel.findAll()),"Ingrese id_Producto: "));
 
+        Producto producto = (Producto) this.objProductoModel.findById(id_producto);
 
-        objCompra.setFecha_compra(fecha_compra);
-        objCompra.setCantidad(cantidad);
-        objCompra.setId_cliente(id_cliente);
-        objCompra.setId_producto(id_producto);
+        if(producto != null) {
+            boolean isActualizado = this.objProductoModel.actualizarStock(producto, cantidad);
 
-        objCompra=(Compra) this.objCompraModel.insert(objCompra);
+            if(!isActualizado) {
+                JOptionPane.showMessageDialog(null, "La cantidad supera el stock del producto");
+                return;
+            }
+
+            objCompra.setFecha_compra(fecha_compra);
+            objCompra.setCantidad(cantidad);
+            objCompra.setId_cliente(id_cliente);
+            objCompra.setId_producto(id_producto);
+
+            objCompra=(Compra) this.objCompraModel.insert(objCompra);
+        }else{
+            JOptionPane.showMessageDialog(null, "Producto no encontrado");
+        }
 
         JOptionPane.showMessageDialog(null,objCompra.toString());
     }

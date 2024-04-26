@@ -2,7 +2,6 @@ package Model;
 
 import DataBase.CRUD;
 import DataBase.ConfigDB;
-import Entity.Compra;
 import Entity.Producto;
 import Entity.Tienda;
 
@@ -284,6 +283,35 @@ public class ProductoModel implements CRUD {
         //7. cerramos la conexión
         ConfigDB.closeConnection();
         return ProductoList;
+    }
+
+
+    public boolean actualizarStock(Producto producto, int cantidad){
+        Connection objconnection = ConfigDB.openConnection();
+        boolean flag = false;
+
+        try{
+
+            if((producto.getStock() - cantidad) < 0) return false;
+
+            String sql ="UPDATE productos SET stock = " + (producto.getStock() - cantidad) + " WHERE id = ?";
+
+            PreparedStatement objprepare = objconnection.prepareStatement(sql);
+
+            objprepare.setInt(1, producto.getId());
+
+            int rowAfected = objprepare.executeUpdate();
+
+            if(rowAfected > 0){
+                flag = true;
+            }
+
+
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(null, "DATA NO ENCONTRADA" + e.getMessage());
+        }
+
+        return flag;
     }
 
 
